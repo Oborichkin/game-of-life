@@ -12,30 +12,36 @@ HEIGHT = (SIZE + MARGIN) * ROWS + MARGIN
 TITLE = "Game Of Life"
 
 
-class MyGame(arcade.Window):
+class GameOfLife(arcade.Window):
 
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
 
+        self.shape_list = None
         self.grid = np.zeros((ROWS, COLS), dtype=int)
 
         arcade.set_background_color(arcade.color.BLACK)
+        self.recreate_grid()
 
-    def on_draw(self):
-        arcade.start_render()
-
+    def recreate_grid(self):
+        self.shape_list = arcade.ShapeElementList()
         for row in range(ROWS):
             for column in range(COLS):
-
-                if self.grid[row][column] == 1:
-                    color = arcade.color.GREEN
-                else:
+                if self.grid[row][column] == 0:
                     color = arcade.color.BLACK
+                else:
+                    color = arcade.color.GREEN
 
                 x = (MARGIN + SIZE) * column + MARGIN + SIZE // 2
                 y = (MARGIN + SIZE) * row + MARGIN + SIZE // 2
 
-                arcade.draw_rectangle_filled(x, y, SIZE, SIZE, color)
+                current_rect = arcade.create_rectangle_filled(x, y, SIZE, SIZE, color)
+                self.shape_list.append(current_rect)
+
+    def on_draw(self):
+        arcade.start_render()
+
+        self.shape_list.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
 
@@ -50,11 +56,12 @@ class MyGame(arcade.Window):
                 self.grid[row][column] = 1
             else:
                 self.grid[row][column] = 0
+        
+        self.recreate_grid()
 
 
 def main():
-
-    MyGame(WIDTH, HEIGHT, TITLE)
+    GameOfLife(WIDTH, HEIGHT, TITLE)
     arcade.run()
 
 
